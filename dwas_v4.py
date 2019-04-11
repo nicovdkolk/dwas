@@ -48,78 +48,108 @@ a_scaled = minmax(a)
 a_random= shuffle(a_scaled, random_state=0)
 
 #separate input features from output features
-in_f = a_random[:,1:13]
-out_f = a_random[:,13:16]
 
-#combine hull ID with scaled input features
-#train_in = np.concatenate((ID_onehot, in_f), axis=1)
-train_in = in_f
-tot_set, in_shape = np.shape(train_in)
+ind_in=np.arange(1,14)
 
-ntrain = int(0.7*tot_set)
+BIGscore=np.empty([np.size(ind_in,0)-2,3])
 
-x_train = train_in[0:ntrain,:]
-y_train = out_f[0:ntrain,:]
+#jj is dropped variable (speed/leeway not included)
+for jj in range(0,np.size(ind_in,0)-1 ):
 
-x_test = train_in[ntrain:tot_set,:]
-y_test = out_f[ntrain:tot_set,:]
+    if jj == 0:
+        #complete set as reference
+        in_f = a_random[:,ind_in]
+    else:
+        #remove one variable
+        in_f = a_random[:,np.delete(ind_in,jj-1)]
+    
+    out_f = a_random[:,13:16]
+    
+    
+    train_in = in_f
+    tot_set, in_shape = np.shape(train_in)
+    
+    ntrain = int(0.7*tot_set)
+    
+    x_train = train_in[0:ntrain,:]
+    y_train = out_f[0:ntrain,:]
+    
+    x_test = train_in[ntrain:tot_set,:]
+    y_test = out_f[ntrain:tot_set,:]
+    
+    
+    #build MLP model
+    model = Sequential()
+    
+    #n nodes
+    n = 100
+    
+    #m hidden layers
+    m=2
+    
+    for ii in range(0,m):
+    
+        model.add(Dense(n, input_dim= in_shape, activation = 'tanh'))
+        model.add(Dropout(0.2))
+    
+    #add output layer
+    model.add(Dense(3, activation='sigmoid'))
+    
+    optmz = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    
+    model.compile(loss='mean_absolute_error',
+                  optimizer=optmz,
+                  metrics=['mae','accuracy'])
+    
+    model.summary()
+    
+    history = model.fit(x_train, y_train,
+              epochs=40,
+              shuffle=True,
+              verbose = 0,
+              batch_size=10,
+              validation_data=(x_test, y_test))
+    
+    score = model.evaluate(x_test, y_test, batch_size=10)
+    
+    ##plot results
+    if 0:
+        fig, ax1 = plt.subplots()
+        
+        ax1.set_xlabel('Epoch')
+        ax1.plot(history.history['acc'])
+        ax1.plot(history.history['val_acc'])
+        ax1.set_ylabel('Accuracy')
+        ax1.legend(['Train', 'Test'], loc='right')
+        ax1.set_ylim([.6,1])
+        
+        ax2=ax1.twinx()
+        ax2.plot(history.history['loss'])
+        ax2.plot(history.history['val_loss'])
+        ax2.set_ylabel('Loss')
+        ax2.set_ylim([0,.2])
+        
+        plt.title('Model Accuracy / Loss : ('+str(n)+' nodes, '+str(m)+' layers)')
+        fig.tight_layout()
+        plt.show()
+    if jj==0:
+        ref=score
+    else:
+        BIGscore[jj-1]=list(np.array(ref) - np.array(score))
 
-
-#build MLP model
-model = Sequential()
-
-#n nodes
-n = 40
-
-#m hidden layers
-m=3
-
-for ii in range(0,m):
-
-    model.add(Dense(n, input_dim= in_shape, activation = 'tanh'))
-    model.add(Dropout(0.2))
-
-#add output layer
-model.add(Dense(3, activation='sigmoid'))
-
-optmz = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-
-model.compile(loss='mean_absolute_error',
-              optimizer=optmz,
-              metrics=['mae','accuracy'])
-
-model.summary()
-
-history = model.fit(x_train, y_train,
-          epochs=40,
-          shuffle=True,
-          verbose = 1,
-          batch_size=10,
-          validation_data=(x_test, y_test))
-
-score = model.evaluate(x_test, y_test, batch_size=10)
-
-##plot results
 fig, ax1 = plt.subplots()
+ax1.set_xticks(np.arange(1,13))
+ax1.set_xticklabels(list(dwas.iloc[:,ind_in]))
+ax1.set_xlabel('Dropped input')
+ax1.set_ylabel('rel. Score')
 
-ax1.set_xlabel('Epoch')
-ax1.plot(history.history['acc'])
-ax1.plot(history.history['val_acc'])
-ax1.set_ylabel('Accuracy')
-ax1.legend(['Train', 'Test'], loc='right')
-ax1.set_ylim([.6,1])
+ax1.plot(ind_in[0:-2],BIGscore[:,0] )
+ax1.plot(ind_in[0:-2],BIGscore[:,2])
 
-ax2=ax1.twinx()
-ax2.plot(history.history['loss'])
-ax2.plot(history.history['val_loss'])
-ax2.set_ylabel('Loss')
-ax2.set_ylim([0,.2])
-
-plt.title('Model Accuracy / Loss : ('+str(n)+' nodes, '+str(m)+' layers)')
+plt.title('Change in Model Accuracy / Loss : ('+str(n)+' nodes, '+str(m)+' layers)')
+ax1.legend(['Loss','Acc'])
 fig.tight_layout()
 plt.show()
-
-#save results
 if 1:
     df = pd.DataFrame(history.history)
     writer = pd.ExcelWriter('dwas_mlp_output.xlsx')
