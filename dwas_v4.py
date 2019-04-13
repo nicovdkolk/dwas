@@ -49,9 +49,9 @@ a_random= shuffle(a_scaled, random_state=0)
 
 #separate input features from output features
 
-ind_in=np.arange(1,14)
+ind_in=np.arange(1,16)
 
-BIGscore=np.empty([np.size(ind_in,0)-2,3])
+BIGscore=np.empty([np.size(ind_in,0)-3,3])
 
 #jj is dropped variable (speed/leeway not included)
 for jj in range(0,np.size(ind_in,0)-1 ):
@@ -82,7 +82,7 @@ for jj in range(0,np.size(ind_in,0)-1 ):
     model = Sequential()
     
     #n nodes
-    n = 100
+    n = 30
     
     #m hidden layers
     m=2
@@ -143,8 +143,8 @@ ax1.set_xticklabels(list(dwas.iloc[:,ind_in]))
 ax1.set_xlabel('Dropped input')
 ax1.set_ylabel('rel. Score')
 
-ax1.plot(ind_in[0:-2],BIGscore[:,0] )
-ax1.plot(ind_in[0:-2],BIGscore[:,2])
+ax1.plot(ind_in[0:-3],BIGscore[:,0] )
+ax1.plot(ind_in[0:-3],BIGscore[:,2])
 
 plt.title('Change in Model Accuracy / Loss : ('+str(n)+' nodes, '+str(m)+' layers)')
 ax1.legend(['Loss','Acc'])
