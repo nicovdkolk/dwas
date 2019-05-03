@@ -6,7 +6,7 @@ Fx, Fy, Sx, Sy, Px, Py files must be in same folder as program and dKE file
 
 Hull sliced into 100 segments -> 100+ inputs, 606 outputs
 
-@author: Brian Freeman and Nico der Kolk
+@author: Brian Freeman and Nico Dkolk
 4 May 2019 - May the Fourth be with you
 """
 
@@ -95,23 +95,59 @@ a = (df.loc[:, df.columns != 0]).values
 
 # combine input datasets
 dKE = np.concatenate((ID_onehot, frnum, leewaynum, a ), axis=1)
+len_dKE = len(dKE.T)
 
 # min/max input dataset
-train_in = minmax(dKE) 
+dKE_in = minmax(dKE) 
 
 # read in training output files
 force_files = ['Fx', 'Fy', 'Px', 'Py', 'Sx', 'Sy']
 
 # prepare output training set using read_force function
-force_out = read_force(force_files)
+force_out = minmax(read_force(force_files))
+len_force = len(force_out.T)
 
-# min/max output training dataset
-train_out = minmax(force_out)
+# make complete matrix to shuffle rows
+tot_train = np.concatenate((dKE_in, force_out ), axis=1)
+len_tot = len(tot_train.T)
 
-# set up training and testing values
+# ask if data should be shuffled
+right_vars = 'n'
+while right_vars == 'n':
+    
+    shuffle = False
+    
+    try:
+        n_shuffle = input('Shuffle data? y/n (default = n) ')
+    except:
+        n_shuffle = 'n'
+    
+    if n_shuffle == 'n':
+        print('No shuffling')
+        shuffle = False
+    
+    else:    
+        print('Data will be shuffled')
+        shuffle = True
+    
+    # shuffle/randomize 
+    if shuffle == True:
+        tot_train = np.take(tot_train, 
+                            np.random.permutation(tot_train.shape[0]), 
+                                                         axis=0, out= tot_train)
+    try:
+        right_vars = input('Continue with modeling (y/n)? (Default = y): ')
+    except:
+        right_vars = 'y'
+        
+# extract input and output training sets
+train_in = tot_train[:,0:len_dKE]
+train_out = tot_train[:,len_dKE:(len_tot-len_dKE)]
+
 tot_set, in_shape = np.shape(train_in)
 tot_set, out_shape = np.shape(train_out)
-'''
+
+# set up training and testing values
 ntrain = int(0.7* tot_set)
 
 x_train = train_in[0:ntrain,:]
@@ -119,7 +155,7 @@ y_train = train_out[0:ntrain,:]
 
 x_test = train_in[ntrain:tot_set,:]
 y_test = train_out[ntrain:tot_set,:]
-'''
+
 # build MLP model
 model = Sequential()
 
@@ -147,14 +183,16 @@ model.compile(loss='mean_absolute_error',
 # print model statistics
 model.summary()
 
-history = model.fit(train_in, train_out,
-          epochs=400,
-          shuffle=True,
-          verbose = 1,
-          batch_size=20,
-          validation_split=0.7)
+batch = 20 # batch size
 
-score = model.evaluate(x_test, y_test, batch_size=20)
+history = model.fit(train_in, train_out,
+          epochs = 400,
+          shuffle = False,
+          verbose = 1,
+          batch_size = batch,
+          validation_data =(x_test, y_test))
+
+score = model.evaluate(x_test, y_test, batch_size = batch)
 
 #plot results
 plt.plot(history.history['acc'])
