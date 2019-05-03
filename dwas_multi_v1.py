@@ -6,7 +6,7 @@ Fx, Fy, Sx, Sy, Px, Py files must be in same folder as program and dKE file
 
 Hull sliced into 100 segments -> 100+ inputs, 606 outputs
 
-@author: Brian Freeman and Nico Dkolk
+@author: Brian Freeman and Nico der Kolk
 4 May 2019 - May the Fourth be with you
 """
 
