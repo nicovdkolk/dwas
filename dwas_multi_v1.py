@@ -55,19 +55,18 @@ def hullextract(hull_run):
     
      return hull, fr, leeway
  
-def read_force(force_files):
+def read_force(force_files,cutoff): #dont think thisis working correctly
     
     force_n = len(force_files)
     for k in range(force_n):
         filename = force_files[k] + '.txt'
         dff = pd.read_csv(filename, skiprows=2, header = None)
-        
+        af = (dff.loc[:, dff.columns != 0].iloc[:,1:-cutoff]).values       
         if k == 0:
-            af = (dff.loc[:, dff.columns != 0]).values
             force_out = af
-            
+
         else:
-          force_out = np.concatenate((force_out, af ), axis=1)  
+            force_out = np.concatenate((force_out, af ), axis=1)  
     
     return force_out
     
@@ -91,7 +90,9 @@ frnum = np.asmatrix(hull_p[:,1]).T; leewaynum = np.asmatrix(hull_p[:,2]).T
 ID_onehot = onehot(hull_p[:,0]) # convert hull number into 1 hot code
 
 # remove ID column and convert to numpy matrix
-a = (df.loc[:, df.columns != 0]).values
+#cut off last couple of points...
+cutoff=4
+a = (df.loc[:, df.columns != 0].iloc[:,:-cutoff]).values
 
 # combine input datasets
 dKE = np.concatenate((ID_onehot, frnum, leewaynum, a ), axis=1)
@@ -104,7 +105,8 @@ dKE_in = minmax(dKE)
 force_files = ['Fx', 'Fy', 'Px', 'Py', 'Sx', 'Sy']
 
 # prepare output training set using read_force function
-force_out = minmax(read_force(force_files))
+force_out = minmax(read_force(force_files,cutoff))
+
 len_force = len(force_out.T)
 
 # make complete matrix to shuffle rows
