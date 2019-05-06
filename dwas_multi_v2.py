@@ -64,6 +64,7 @@ def read_force(force_files):
     for k in range(force_n):
         filename = force_files[k] + '.txt'
         dff = pd.read_csv(filename, skiprows=2, header = None)
+        dff_n = len(dff.T)
         
         # first file (fixed 5 May 2019)
         if k == 0:
