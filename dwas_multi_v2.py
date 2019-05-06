@@ -7,7 +7,7 @@ Removed first and last columns to avoid transitory effects (5 May)
 Fixed error merging training output files (5 May 2019)
 Hull sliced into 100 segments -> 100+ inputs, 594 outputs
 
-@author: Brian Freeman and Nico de Kolk
+@author: Brian Freeman and Nico van der Kolk
 4 May 2019 - May the Fourth be with you
 """
 
@@ -67,13 +67,13 @@ def read_force(force_files):
         
         # first file (fixed 5 May 2019)
         if k == 0:
-            af = dff.loc[:, dff.columns != dff_n] # remove last column
+            af = dff.loc[:, :-2] # remove last column
             af = (dff.loc[:, dff.columns > 2]).values # remove first  3 columns
             force_out = af # set to first file
         
         # all other files
         else:
-            af = dff.loc[:, dff.columns != dff_n] # remove last column
+            af = dff.loc[:, :-2] # remove last column
             af = (dff.loc[:, dff.columns > 2]).values # remove first  3 columns
             force_out = np.concatenate((force_out, af), axis=1)  # add other files
     
@@ -90,7 +90,7 @@ n_dfcols = len(df.columns)
 
 hull_p = np.zeros((n_dflen,3))
 
-# get hull, froud, and leeway from ID
+# get hull, froude, and leeway from ID
 for j in range(n_dflen):
     
     hull_p[j,0], hull_p[j,1], hull_p[j,2] = hullextract(df.iloc[j,0])
@@ -100,7 +100,7 @@ frnum = np.asmatrix(hull_p[:,1]).T; leewaynum = np.asmatrix(hull_p[:,2]).T
 ID_onehot = onehot(hull_p[:,0]) # convert hull number into 1 hot code
 
 # remove ID column and convert to numpy matrix
-a = (df.loc[:, df.columns != 0]).values
+a = read_force(['dKE'])
 
 # combine input datasets
 dKE = np.concatenate((ID_onehot, frnum, leewaynum, a ), axis=1)
@@ -185,9 +185,9 @@ model.add(Dense(n, activation = 'tanh'))
 model.add(Dropout(0.2))
 
 # add output layer
-model.add(Dense(out_shape, activation='sigmoid'))
+model.add(Dense(out_shape, activation='tanh'))
 
-optmz = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+optmz = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
 
 model.compile(loss='mean_absolute_error',
               optimizer=optmz,
@@ -208,20 +208,23 @@ history = model.fit(train_in, train_out,
 score = model.evaluate(x_test, y_test, batch_size = batch)
 
 #plot results
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
-plt.title('Model accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+fig, ax1 = plt.subplots()
 
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('Model loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
+ax1.set_xlabel('Epoch')
+ax1.plot(history.history['acc'])
+ax1.plot(history.history['val_acc'])
+ax1.set_ylabel('Accuracy')
+ax1.legend(['Train', 'Test'], loc='right')
+#ax1.set_ylim([.6,1])
+
+ax2=ax1.twinx()
+ax2.plot(history.history['loss'])
+ax2.plot(history.history['val_loss'])
+ax2.set_ylabel('Loss')
+#ax2.set_ylim([0,.2])
+
+plt.title('Model Accuracy / Loss')
+fig.tight_layout()
 plt.show()
 
 #save results
