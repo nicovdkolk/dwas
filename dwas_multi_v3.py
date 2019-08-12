@@ -7,7 +7,7 @@ Removed first and last columns to avoid transitory effects (5 May)
 Fixed error merging training output files (5 May 2019)
 Hull sliced into 100 segments -> Looks at F, P or S individually
 
-@author: Brian Freeman and Nico de Kolk
+@author: Brian Freeman and Nico van der Kolk
 4 May 2019 - May the Fourth be with you
 """
 
@@ -112,8 +112,8 @@ dKE_in = minmax(dKE)
 
 # read in training output files
 #force_files = ['Fx', 'Fy', 'Px', 'Py', 'Sx', 'Sy']
-#force_files = ['Fx','Fy']
-force_files = ['Px','Py']
+force_files = ['Fx','Fx']
+#force_files = ['Fy','Fy']
 #force_files = ['Sx','Sy']
 
 # prepare output training set using read_force function
@@ -125,33 +125,16 @@ tot_train = np.concatenate((dKE_in, force_out ), axis=1)
 len_tot = len(tot_train.T)
 
 # ask if data should be shuffled
-right_vars = 'n'
-while right_vars == 'n':
+right_vars = 'y'
+if right_vars == 'y':
+    print('Data will be shuffled')
+    shuffle = True
     
-    shuffle = False
-    
-    try:
-        n_shuffle = input('Shuffle data? y/n (default = n) ')
-    except:
-        n_shuffle = 'n'
-    
-    if n_shuffle == 'n':
-        print('No shuffling')
-        shuffle = False
-    
-    else:    
-        print('Data will be shuffled')
-        shuffle = True
-    
-    # shuffle/randomize 
-    if shuffle == True:
-        tot_train = np.take(tot_train, 
-                            np.random.permutation(tot_train.shape[0]), 
-                                                         axis=0, out= tot_train)
-    try:
-        right_vars = input('Continue with modeling (y/n)? (Default = y): ')
-    except:
-        right_vars = 'y'
+# shuffle/randomize 
+if shuffle == True:
+    tot_train = np.take(tot_train, 
+                        np.random.permutation(tot_train.shape[0]), 
+                                                     axis=0, out= tot_train)
         
 # extract input and output training sets
 train_in = tot_train[:,0:len_dKE]
@@ -204,7 +187,7 @@ model.summary()
 batch = 50 # batch size
 
 history = model.fit(train_in, train_out,
-          epochs = 100,
+          epochs = 200,
           shuffle = True,
           verbose = 1,
           batch_size = batch,
@@ -213,20 +196,23 @@ history = model.fit(train_in, train_out,
 score = model.evaluate(x_test, y_test, batch_size = batch)
 
 #plot results
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
-plt.title('Model accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+fig, ax1 = plt.subplots()
 
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('Model loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
+ax1.set_xlabel('Epoch')
+ax1.plot(history.history['acc'])
+ax1.plot(history.history['val_acc'])
+ax1.set_ylabel('Accuracy')
+ax1.legend(['Train', 'Test'], loc='right')
+#ax1.set_ylim([.6,1])
+
+ax2=ax1.twinx()
+ax2.plot(history.history['loss'])
+ax2.plot(history.history['val_loss'])
+ax2.set_ylabel('Loss')
+#ax2.set_ylim([0,.2])
+
+plt.title('Model Accuracy / Loss')
+fig.tight_layout()
 plt.show()
 
 '''
