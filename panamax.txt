@@ -1,0 +1,2 @@
+ID	Description	Cp	Cb	Cm	L_B	B_T	T_L	L_vol3	Cwp	AwpSw	Rb_T	Deadrise
+99	Panamax		0.835	0.830	0.994	9.06	1.333	0.083	6.73	0.909	0.566	0.415	0.000

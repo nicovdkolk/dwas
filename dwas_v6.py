@@ -42,7 +42,7 @@ Xdropout= []
 
 # get input data
 hull_file = 'hulls.txt'
-dwas_file = 'dwas_data.txt'
+dwas_file = 'DWA_DATA_ND.txt'
 current_path = os.getcwd()  # get current working path to save later
 
 #upload hulls
@@ -59,8 +59,8 @@ df_tot =df_tot.drop(['Description', 'Hull'], axis=1) # delete columns
 
 df_tot = df_tot.rename(columns={"ID": "Hull"}) # change ID column to Hull
 
-df_y = df_tot[['Fx', 'Fy', 'Mz']]
-df_x = df_tot.drop(['Hull', 'Fx', 'Fy', 'Mz'], axis=1) 
+df_y = df_tot[['Xnd', 'Ynd', 'Nnd']]
+df_x = df_tot.drop(['Hull', 'Xnd', 'Ynd', 'Nnd'], axis=1) 
 
 x_raw = df_x.values
 y_raw = np.asmatrix((df_y.values))
@@ -200,6 +200,3 @@ if 1:
     writer = pd.ExcelWriter('dwas_mlp_output.xlsx')
     df.to_excel(writer,'DWAS MLP Results')
     writer.save()
-    
-
-
