@@ -38,6 +38,16 @@ def minmax(a):
     return scaler.transform(a)
 '''
 
+def make_trig(df):
+    # takes one df column and makes np sine & cosine columns
+    rads = np.asmatrix(np.radians(df.values))
+    cos = np.cos(rads).T
+    sin = np.sin(rads).T
+    return np.concatenate((cos,sin), axis = 1)
+    
+# **********************************************************************
+# Main program start
+       
 # fix random seed for reproducibility
 np.random.seed(7)
 Xbatch = []
@@ -47,16 +57,18 @@ Xdropout= []
 # get data files
 hull_file = 'hulls.txt'  # hulls
 dwas_file = 'DWA_DATA_ND.txt' #main dwas data with hull number to link to hull_file
+
+# $$$$$$$$$$$$$$ prediction file - prediction file has hull info
 predict_file = 'hull1.xlsx'
 
 current_path = os.getcwd()  # get current working path to save later
 
-#upload data files
+#upload data & prediction files
 hulls_df = pd.read_csv(hull_file, engine = 'python', sep= '\s+|\t+|\s+\t+|\t+\s+')
 dwas_df = pd.read_csv(dwas_file)
 predict_df = pd.read_excel(predict_file)
 
-#add hull info to each observation
+#add hull info to each training observation
 df_tot = pd.merge(right=dwas_df,left=hulls_df, 
                   how='left', 
                   left_on='ID', 
@@ -66,11 +78,19 @@ df_tot =df_tot.drop(['Description', 'Hull'], axis=1) # delete columns
 
 df_tot = df_tot.rename(columns={"ID": "Hull"}) # change ID column to Hull
 
+# segragate input training (x) from output training (y)
 df_y = df_tot[['Xnd', 'Ynd', 'Nnd']]
-df_x = df_tot.drop(['Hull', 'Xnd', 'Ynd', 'Nnd'], axis=1) 
 
-x_raw = df_x.values
+# drop unneccesary rows for x - will remake leeway & heel as trig components
+df_x = df_tot.drop(['Hull', 'leeway', 'heel','Xnd', 'Ynd', 'Nnd'], axis=1) 
+
+# convert to numpy 
+x_raw = df_x.values  
 y_raw = np.asmatrix((df_y.values))
+
+# add leeway and trig components to x
+trig = np.concatenate((make_trig(df_tot['leeway']), make_trig(df_tot['heel'])), axis = 1 )
+x_raw = np.concatenate((x_raw, trig), axis = 1)
 
 x_raw_ct = len(x_raw.T)
 y_raw_ct = len(y_raw.T)
@@ -177,7 +197,7 @@ batch = 128 # batch size
 
 #####train network
 history = model.fit(x_train, y_train,
-          epochs = 100,
+          epochs = 175,
           shuffle = False,
           verbose = 1,
           batch_size = batch, validation_split=0.3)
@@ -185,7 +205,13 @@ history = model.fit(x_train, y_train,
 score = model.evaluate(x_test, y_test, batch_size = batch)
 
 # predict input file by transforming the data for computation then inversing the transform
-future = scaler_out.inverse_transform(model.predict(scaler_in.transform(predict_df.values)))
+# add leeway and trig components to x
+
+x_predict = predict_df.drop(['leeway', 'heel'], axis=1).values
+pred_trig = np.concatenate((make_trig(predict_df['leeway']), make_trig(predict_df['heel'])), axis = 1 )
+x_predict = np.concatenate((x_predict, pred_trig), axis = 1)
+
+future = scaler_out.inverse_transform(model.predict(scaler_in.transform(x_predict)))
 
 m = 3 # of layers
 
@@ -203,6 +229,7 @@ plt.ylabel('Percentage')
 plt.xlabel('Epoch')
 plt.legend(['Training Accuracy', 'Validation Accuracy', 'Loss'], loc='center right')
 plt.show()
+
 
 if 1:
     df = pd.DataFrame(history.history)
