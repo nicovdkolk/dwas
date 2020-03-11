@@ -190,7 +190,7 @@
 	%	\label{fig:5heel}
 	%\end{figure*}
 	
-	The sailing performance for wind-assisted ships is synonymous with maneuvering forces for the steady drift condition, including vessel heel angle. A right hand rule is adopted with the $z$ axis pointed down. All rotations are performed about midship at the calm water line. Forces and moments are presented in flow-aligned coordinates, $<x,y>$, with the suitable transformation as in \cref{fig:cutcoord}.
+	The sailing performance for wind-assisted ships is synonymous with manoeuvring forces for the steady drift condition, including vessel heel angle. A right hand rule is adopted with the $z$ axis pointed down. All rotations are performed about midship at the calm water line. Forces and moments are presented in flow-aligned coordinates, $<x,y>$, with the suitable transformation as in \cref{fig:cutcoord}.
 	
 	\begin{figure}[!ht]
 		\centering
@@ -208,7 +208,7 @@
 	\subsubsection{Sailing efficiency}
 	For modeling of wind-assist vessels, the resistance increase due to the sailing condition (heel angle $\phi$, and leeway angle $\beta$) is expressed as an effective draft \Te. This quantity is related to the slope of a linear fit through data for several heel and leeway angles (bottom-left in \cref{fig:5heel}).
 	
-	Following theories for low-aspect planforms \cite{Hoerner1985,Jones1946}, this induced drag may be significant for commercial ships, meaning that the thrust delivered by a wind propulsor might well be overwhelmed by this increase in resistance. Though the flow mechanisms only vaguely resemble the Prandtl lifting-line and the associated derivation for the induced drag \cite{Prandtl1918}, the accounting for energy loss in shed vorticity is especially relevant for the present application. Following the analysis of sailing yachts by \citet{Gerritsma1992}, the resistance increase due to sideforce production is modeled as an effective draft, $T_{e}$ \cite{Gerritsma1993}, which is a metric for the sailing efficiency of the hull. The expression is derived from the lifting-line theory of wings. In non-dimensional form:
+	Following theories for low-aspect platforms \cite{Hoerner1985,Jones1946}, this induced drag may be significant for commercial ships, meaning that the thrust delivered by a wind propulsor might well be overwhelmed by this increase in resistance. Though the flow mechanisms only vaguely resemble the Prandtl lifting-line and the associated derivation for the induced drag \cite{Prandtl1918}, the accounting for energy loss in shed vorticity is especially relevant for the present application. Following the analysis of sailing yachts by \citet{Gerritsma1992}, the resistance increase due to sideforce production is modeled as an effective draft, $T_{e}$ \cite{Gerritsma1993}, which is a metric for the sailing efficiency of the hull. The expression is derived from the lifting-line theory of wings. In non-dimensional form:
 	
 	\begin{subequations}
 		\begin{align}
@@ -220,7 +220,7 @@
 	\end{subequations}
 	
 	\noindent
-	Forces and moments are non-dimensionalized using the dynamic pressure $q=\frac{1}{2}\rho U^2 $ following the maneuvering convention. A linear and thrid order term are assumed for $\beta$, and a linear term for $\phi$. The \ARe, as in \cref{eq:CDi} is derived from a (linear) curve fit. A non-dimensional form for the effective draft \Te is made with the vessel draft: \TeT \cref{eq:Te}, providing a convenient metric for the sailing efficiency of the hull. Some difficulty arises on account of the non-linear response of the commercial ship hull.
+	Forces and moments are non-dimensionalized using the dynamic pressure $q=\frac{1}{2}\rho U^2 $ following the maneuvering convention. A linear and third order term are assumed for $\beta$, and a linear term for $\phi$. The \ARe, as in \cref{eq:CDi} is derived from a (linear) curve fit. A non-dimensional form for the effective draft \Te is made with the vessel draft: \TeT \cref{eq:Te}, providing a convenient metric for the sailing efficiency of the hull. Some difficulty arises on account of the non-linear response of the commercial ship hull.
 	
 	\subsubsection{Vessel course keeping ability}
 	The second quantity of principal interest for this modeling for wind-assist vessels is the center of effort for the distribution of lateral force, also known as the center of lateral resistance. The position of the \CLR is determined as the quotient of the yaw moment and the sideforce.
@@ -252,9 +252,9 @@
 		\label{fig:CLRdemo}
 	\end{figure*}
 	\noindent
-	First, observe the \CLR for the un-appended hull, which lies more than half a ships-length ahead of the bow (shown only for nine degrees leeway), a consequence of the stronger development of the yawing moment—linear with leeway angle—compared against the sideforce, which includes a significant higher-order dependency for leeway angle. The \CLR moves aft as the leeway angle increases, an effect that is driven by an increase in flow separation along the bilges. This effect is manifest as a rising contribution for the higher-order sideforce term in the sway equation, and an attenuation of the “Munk” moment for the yaw equation by flow separation along the vessel aft-body. Yaw balance, achieved by aligning the aerodynamic center of the wind propulsors with the hydrodynamic center (\CLR) of the hull \cite{Claughton03}, is impossible.
+	First, observe the \CLR for the un-appended hull, which lies more than half a ships-length ahead of the bow (shown only for nine degrees leeway), a consequence of the stronger development of the yawing moment-linear with leeway angle-compared against the sideforce, which includes a significant higher-order dependency for leeway angle. The \CLR moves aft as the leeway angle increases, an effect that is driven by an increase in flow separation along the bilges. This effect is manifest as a rising contribution for the higher-order sideforce term in the sway equation, and an attenuation of the “Munk” moment for the yaw equation by flow separation along the vessel aft-body. Yaw balance, achieved by aligning the aerodynamic center of the wind propulsors with the hydrodynamic center (\CLR) of the hull \cite{Claughton03}, is impossible.
 	
-	The estimation of the hydrodynamic derivatives follows from analysis of results from the database of full-scale simulation results, as described in \cite{Kolk18c,Kolk19d}, for the \DWA. This approach to vessel modeling follows the same methodology as \citet{Tsakonas1959,Jacobs1966,Inoue1981,Keuning1998,Tox11}, in the maneuvering and sailing fields.
+	The estimation of the hydrodynamic derivatives follows from analysis of results from the database of full-scale simulation results, as described in \cite{Kolk18c,Kolk19d}, for the \DWA. This approach to vessel modeling follows the same methodology as \citet{Tsakonas1959,Jacobs1966,Inoue1981,Keuning1998,Tox11}, in the manoeuvring and sailing fields.
 	
 	\subsubsection{Reynolds-averaged Navier Stokes simulation}
 	
@@ -467,7 +467,7 @@ Machine learning uses datasets to train software to recognize patterns or predic
 	
 	\section{Discussion}
 	
-	A feed forward neural network was trained as a universal approximator and tested using input parameters from 61 different hulls and outputs from 1,567 RANS-CFD simulations. The network rapidly trained and experienced very high training accuracies underscoring the overall continuous nature of the RANS-CFD algorithms. The network accuracies were smaller, but still acceptable when tested with reserved datasets not used for training.
+	A feed forward neural network was trained as a universal approximator and tested using input parameters from 61 different hulls and outputs from 1,574 RANS-CFD simulations. The network rapidly trained and experienced very high training accuracies underscoring the overall continuous nature of the RANS-CFD algorithms. The network accuracies were smaller, but still acceptable when tested with reserved datasets not used for training.
 
 	The differing errors of the individual hull compared to the average error for all 60 different hulls in Table \ref{tab:test_results} suggests that different hulls have higher error rates than other. It is also consistent with universal approximation theory that states that algorithms would be estimated best within a small subset as compared to a larger population. Working with individual hulls may produce more accurate results within the hull parameters as compared to generalizing may hulls as this research did. This must be investigated in order to identify how the network accommodates variation within hull design and extrapolate to hull designs not included in the original training set.
 	The time and computational saving for additional runs should not be underestimated. The process of generating the original 1,574 runs from existing RANS-CFD models that provided the necessary training data took almost 2 years to accomplish. The results for 600 runs from a trained network took less than a millisecond after taking less than 2 minutes to train.
